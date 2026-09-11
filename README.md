@@ -61,7 +61,7 @@ y Pages habilitado con source "GitHub Actions".
 Nunca commitear contraseñas reales acá — para probar:
 
 ```
-cp sitio/usuarios.example.json sitio/usuarios.json   # usuario: fernando / agustin / guido — contraseña: demo123
+cp sitio/usuarios.example.json sitio/usuarios.json   # usuario: admin — contraseña: 12345
 cd sitio && python -m http.server 8000
 ```
 

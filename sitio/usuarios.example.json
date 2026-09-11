@@ -1,5 +1,3 @@
 [
-  {"usuario": "fernando", "nombre": "Fernando", "hash": "d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791"},
-  {"usuario": "agustin", "nombre": "Agustín", "hash": "d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791"},
-  {"usuario": "guido", "nombre": "Guido", "hash": "d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791"}
+  {"usuario": "admin", "nombre": "Admin", "hash": "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5"}
 ]
