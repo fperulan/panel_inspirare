@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inspirare · Estado de proyectos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0F151E;
+  --surface:#171F2B;
+  --surface-2:#1E2836;
+  --line:#2A3545;
+  --ink:#DEE6F0;
+  --ink-dim:#8494A9;
+  --ink-faint:#5C6B80;
+  --accent:#5B9CF8;
+  --ok:#4FB286;
+  --warn:#E0A33E;
+  --stop:#E06C63;
+  --radius:10px;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent)}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- shell ---------- */
+.shell{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+.rail{
+  background:var(--surface);border-right:1px solid var(--line);
+  padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto
+}
+.brand{padding:0 20px 18px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.brand b{display:block;font-weight:600;letter-spacing:-.01em}
+.brand span{display:block;color:var(--ink-faint);font-size:12.5px}
+.rail h4{
+  margin:18px 20px 6px;font-size:11.5px;font-weight:500;
+  color:var(--ink-faint);letter-spacing:.02em
+}
+.navbtn{
+  display:flex;align-items:center;gap:9px;width:100%;text-align:left;
+  background:none;border:0;padding:7px 20px;color:var(--ink-dim);
+  border-left:2px solid transparent
+}
+.navbtn:hover{color:var(--ink);background:#1B2534}
+.navbtn[aria-current="true"]{color:var(--ink);border-left-color:var(--accent);background:#1B2534;font-weight:500}
+.dot{width:7px;height:7px;border-radius:50%;flex:none}
+.dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.stop{background:var(--stop)}.dot.idle{background:var(--ink-faint)}
+.main{padding:28px 34px 80px;max-width:1080px}
+
+/* ---------- headings ---------- */
+h1{font-size:25px;font-weight:600;letter-spacing:-.02em;margin:0 0 4px}
+h2{font-size:17px;font-weight:600;margin:34px 0 12px;letter-spacing:-.01em}
+h3{font-size:14.5px;font-weight:600;margin:0 0 6px}
+.lede{color:var(--ink-dim);margin:0 0 8px;max-width:68ch}
+.mono{font-family:var(--mono);font-size:12.5px;color:var(--ink-dim)}
+
+/* ---------- cards ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.stack{display:flex;flex-direction:column;gap:12px}
+
+/* ---------- timeline ---------- */
+.ruler{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);overflow:hidden}
+.ruler-scroll{overflow-x:auto}
+.ruler-grid{display:grid;grid-template-columns:104px repeat(6,minmax(150px,1fr));min-width:760px}
+.rcell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:9px 11px}
+.rcell:last-child{border-right:0}
+.rhead{background:var(--surface-2)}
+.rhead .n{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.rhead .d{font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+.rlabel{color:var(--ink-dim);font-size:13px;display:flex;align-items:center;gap:8px}
+.rcell.now{background:#1C2942;box-shadow:inset 0 2px 0 var(--accent)}
+.rfocus{font-size:12.8px;line-height:1.4;color:var(--ink-dim)}
+.rcell.now .rfocus{color:var(--ink)}
+.rcell.done{opacity:.55}
+
+/* ---------- blocker ---------- */
+.blocker{border-left:3px solid var(--warn);background:#221E14;border-radius:0 var(--radius) var(--radius) 0;padding:13px 16px}
+.blocker.clear{border-left-color:var(--ok);background:#152420}
+.blocker h3{display:flex;gap:8px;align-items:baseline}
+.age{font-family:var(--mono);font-size:11.5px;color:var(--warn)}
+
+/* ---------- progress ---------- */
+.bar{height:5px;background:var(--surface-2);border-radius:3px;overflow:hidden;margin:8px 0 2px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .25s}
+.dod{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.dod li{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;color:var(--ink-dim)}
+.dod input{margin:3px 0 0;accent-color:var(--accent);flex:none}
+.dod li.on{color:var(--ink-faint);text-decoration:line-through}
+
+/* ---------- feed ---------- */
+.feed{list-style:none;margin:0;padding:0}
+.feed li{display:grid;grid-template-columns:88px 1fr;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.feed li:first-child{border-top:0}
+.feed time{font-family:var(--mono);font-size:12px;color:var(--ink-faint)}
+.who{font-size:12.5px;color:var(--ink-faint);margin-top:3px}
+.tag{
+  display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:20px;
+  border:1px solid var(--line);color:var(--ink-dim);margin-right:7px
+}
+.tag.decision{border-color:#3A4D6B;color:#8FB4E8}
+.tag.bloqueo{border-color:#5A4526;color:var(--warn)}
+.tag.avance{border-color:#2C4A3D;color:var(--ok)}
+
+/* ---------- table ---------- */
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-weight:500;color:var(--ink-faint);font-size:12.5px;padding:0 10px 8px 0;border-bottom:1px solid var(--line)}
+td{padding:9px 10px 9px 0;border-bottom:1px solid var(--line);color:var(--ink-dim);vertical-align:top}
+td b{color:var(--ink);font-weight:500}
+
+/* ---------- forms / mail ---------- */
+.opts{display:flex;flex-direction:column;gap:9px;margin:2px 0 0}
+.opt{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink-dim)}
+.opt input{margin:3px 0 0;accent-color:var(--accent);flex:none}
+input[type=text],select,textarea{
+  width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);
+  border-radius:7px;padding:8px 11px;font-family:inherit;font-size:14px
+}
+textarea{min-height:90px;resize:vertical;line-height:1.5}
+label.fld{display:block;margin-bottom:12px}
+label.fld span{display:block;font-size:13px;color:var(--ink-dim);margin-bottom:5px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>*{flex:1 1 180px}
+.btn{background:var(--accent);color:#08111E;border:0;border-radius:7px;padding:9px 16px;font-weight:600}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink-dim);font-weight:500}
+.btn:hover{filter:brightness(1.08)}
+.preview{
+  background:#F6F7F9;color:#1A2230;border-radius:var(--radius);padding:22px 24px;
+  font-size:13.5px;line-height:1.6;max-width:62ch
+}
+.preview h4{margin:0 0 2px;font-size:16px;color:#0F1724}
+.preview .sub{color:#5A6B82;font-size:12.5px;margin:0 0 16px;font-family:var(--mono)}
+.preview h5{margin:18px 0 5px;font-size:13.5px;color:#0F1724}
+.preview ul{margin:0;padding-left:18px}
+.preview li{margin-bottom:4px}
+.preview .flag{background:#FDF3E0;border-left:3px solid #C98A1E;padding:9px 12px;border-radius:0 6px 6px 0;margin-top:6px}
+pre.md{
+  background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;
+  color:var(--ink-dim);white-space:pre-wrap;line-height:1.55
+}
+.note{font-size:12.8px;color:var(--ink-faint);max-width:66ch}
+.empty{color:var(--ink-faint);font-size:13.5px;padding:16px 0}
+.hidden{display:none}
+
+/* ---------- login ---------- */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;width:100%;max-width:340px}
+.login-card b{display:block;font-size:20px;font-weight:600;margin-bottom:4px}
+.login-error{color:var(--stop);font-size:13px;margin:-4px 0 12px;line-height:1.4}
+.quien{color:var(--ink-faint);font-size:12px;margin-top:8px}
+.logout{margin-top:8px;padding:4px 10px;font-size:12px}
+
+/* ---------- mobile ---------- */
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .rail{
+    position:static;height:auto;padding:14px 0 8px;
+    border-right:0;border-bottom:1px solid var(--line)
+  }
+  .brand{padding:0 16px 12px}
+  .rail h4{display:none}
+  .railnav{display:flex;gap:4px;overflow-x:auto;padding:10px 12px 2px;scroll-snap-type:x mandatory}
+  .navbtn{
+    width:auto;white-space:nowrap;border-left:0;border-bottom:2px solid transparent;
+    border-radius:6px 6px 0 0;padding:6px 12px;scroll-snap-align:start
+  }
+  .navbtn[aria-current="true"]{border-left:0;border-bottom-color:var(--accent)}
+  .main{padding:20px 16px 64px}
+  .grid2{grid-template-columns:1fr}
+  h1{font-size:21px}
+  .feed li{grid-template-columns:1fr;gap:3px}
+}
+</style>
+</head>
+<body>
+
+<div class="login-wrap" id="loginWrap">
+  <form class="login-card" id="loginForm">
+    <b>Inspirare</b>
+    <p class="lede" style="margin-bottom:18px">Estado de proyectos — ingresá con tu usuario del equipo.</p>
+    <label class="fld"><span>Usuario</span><input type="text" id="loginUsuario" autocomplete="username" required></label>
+    <label class="fld"><span>Contraseña</span><input type="password" id="loginPassword" autocomplete="current-password" required></label>
+    <p class="login-error hidden" id="loginError"></p>
+    <button class="btn" type="submit" style="width:100%">Entrar</button>
+  </form>
+</div>
+
+<div class="shell hidden" id="shell">
+
+  <nav class="rail">
+    <div class="brand">
+      <b>Inspirare</b>
+      <span>Estado de proyectos</span>
+      <div class="quien" id="quienSoy"></div>
+      <button class="btn ghost logout" id="logoutBtn" type="button">Cerrar sesión</button>
+    </div>
+    <div class="railnav" id="railnav"></div>
+  </nav>
+
+  <main class="main" id="main"></main>
+</div>
+
+<script>
+/* =========================================================================
+   state — en producción esto es state.json, generado por el recolector
+   que lee los .md de OneDrive. Acá va embebido para el prototipo.
+   Krikos usa el contenido real de los archivos; los otros dos son muestra.
+   ========================================================================= */
+const HOY = '2026-09-11';
+
+const state = {
+  semana: {del:'2026-09-14', al:'2026-09-20', etiqueta:'Semana del 14 al 20 de septiembre'},
+  proyectos: [
+  {
+    id:'krikos',
+    nombre:'LP SA — Fill Rate y Servil Compras',
+    codigo:'PO_LP_26_Krikos-Compras-FillRate',
+    cliente:'LoPresti Posca',
+    salud:'warn',
+    kickoff:'2026-09-15',
+    cierre:'2026-12-07',
+    sprints:[
+      {n:1, del:'2026-09-15', al:'2026-09-28',
+       A:'Relevamiento final + mockup de la hoja de Fill Rate',
+       B:'Relevamiento con Lucas + vista de Compras de Willy Mouse'},
+      {n:2, del:'2026-09-29', al:'2026-10-12',
+       A:'Medidas de fill rate y back order, validadas contra el Excel de Carlos Font',
+       B:'Modelo semántico de Compras + motor de reglas v1'},
+      {n:3, del:'2026-10-13', al:'2026-10-26',
+       A:'Publicación en Power BI Service, capacitación y puesta en marcha',
+       B:'Servidor MCP + Project "Megamente Compras" funcionando'},
+      {n:4, del:'2026-10-27', al:'2026-11-09',
+       A:'En producción — soporte liviano',
+       B:'Motor de alertas v1 en modo interno, calibrando falsos positivos'},
+      {n:5, del:'2026-11-10', al:'2026-11-23',
+       A:'En producción — soporte liviano',
+       B:'Calibración de umbrales + consultas a demanda en el Megamente'},
+      {n:6, del:'2026-11-24', al:'2026-12-07',
+       A:'En producción — soporte liviano',
+       B:'Pruebas finales, capacitación y alertas en producción'}
+    ],
+    frentes:[
+      {
+        id:'A', nombre:'Tablero Fill Rate', responsable:'Juan Manuel Daher',
+        archivo:'Seguimiento/Sprints/Sprint_01_FillRate.md',
+        objetivo:'Cerrar el diseño de la hoja antes de escribir una sola medida DAX, para que el Sprint 2 sea construcción y no descubrimiento.',
+        hito:{
+          texto:'Reunión con Carlos Font para confirmar el conector entre la Vista de Ventas y la de Carga de Pedidos, y cómo arma hoy el Excel semanal.',
+          estado:'pendiente', desde:'2026-09-15'
+        },
+        dod:[
+          {t:'Conector Vista de Ventas / Carga de Pedidos validado contra datos reales', ok:false},
+          {t:'Mockup de la hoja acordado con Carlos Font', ok:false},
+          {t:'Definición de fill rate y back order documentada', ok:false}
+        ]
+      },
+      {
+        id:'B', nombre:'Servil Compras / Megamente Compras', responsable:'Fernando Perulan',
+        archivo:'Seguimiento/Sprints/Sprint_01_Compras.md',
+        objetivo:'Relevar a fondo el criterio de compra de Lucas y dejarlo escrito como reglas explícitas. Es el hito bloqueante de los cinco sprints que siguen.',
+        hito:{
+          texto:'Relevamiento con Lucas: umbrales de sobrestock, criterios de quiebre, prioridades de reposición, diferencias Distribuidora / FacilHome y discontinuados con reemplazo.',
+          estado:'pendiente', desde:'2026-09-15'
+        },
+        dod:[
+          {t:'Documento de reglas de negocio confirmado por Lucas, no sólo escrito por Inspirare', ok:false},
+          {t:'Vista de Compras de Willy Mouse en mano, con documentación técnica', ok:false},
+          {t:'Gaps identificados entre lo que Lucas necesita y lo que la vista responde hoy', ok:false}
+        ]
+      }
+    ],
+    riesgos:[
+      {t:'El relevamiento con Lucas bloquea todo Servil Compras. Si se atrasa, el modelo semántico, el motor de reglas y las alertas se corren en cadena.', nivel:'alto'},
+      {t:'No sobre-prometer en las alertas: reglas simples y explícitas calibradas con Lucas, no un motor estadístico de anomalías.', nivel:'medio'},
+      {t:'Fill Rate necesita validación numérica exacta contra el Excel manual de Carlos Font. Un desvío chico rompe la confianza del equipo comercial.', nivel:'medio'}
+    ],
+    bitacora:[
+      {fecha:'2026-09-10', autor:'Fernando', tipo:'decision',
+       t:'Confirmado el alcance reducido tras la aprobación de Mauricio: Fill Rate y Servil Compras entran, Integreitor queda fuera de esta etapa. El proyecto baja de cinco o seis meses a tres.'},
+      {fecha:'2026-09-10', autor:'Fernando', tipo:'decision',
+       t:'Reparto de frentes acordado con JMD. Entregables del Frente B en COMPRAS/, avances en Seguimiento/Bitacora_Fernando.md. Cada uno edita sólo lo suyo.'},
+      {fecha:'2026-09-10', autor:'Fernando', tipo:'avance',
+       t:'Lectura completa de la carpeta del proyecto para tomar contexto antes del kick off del 15.'},
+      {fecha:'2026-09-09', autor:'Agustín', tipo:'decision',
+       t:'Kick off fijado para el lunes 15, con arranque del Sprint 1 el mismo día.'}
+    ],
+    proximos:[
+      {t:'Preparar la guía de relevamiento para la reunión con Lucas', quien:'Fernando'},
+      {t:'Repasar el PDF de Fill Rate Q1 y el mail semanal de Carlos Font antes de la reunión', quien:'JMD'}
+    ],
+    lineamientos:[
+      {fecha:'2026-09-09', de:'Agustín', para:'Fernando y JMD',
+       t:'Antes del kick off quiero los dos Sprint 1 escritos con hito bloqueante y definición de hecho, para presentarlos al cliente el lunes.', estado:'cumplido'}
+    ]
+  },
+  {
+    id:'sauda', nombre:'SAUDA — Megamente y monitoreo de precios', codigo:'SAUDA SRL',
+    cliente:'SAUDA SRL', salud:'ok', kickoff:'2026-03-02', cierre:'2026-10-30',
+    sprints:[], frentes:[], riesgos:[],
+    bitacora:[
+      {fecha:'2026-09-08', autor:'Guido', tipo:'avance',
+       t:'Ajuste de la desviación 4 / 8 / 10 en función del cv_grupo, pendiente de revisión con el cliente.'},
+      {fecha:'2026-09-05', autor:'Fernando', tipo:'bloqueo',
+       t:'Los Megamente corren con MCP local y deberían correr en MCP remoto. Sin eso el cliente no los puede usar solo.'}
+    ],
+    proximos:[], lineamientos:[]
+  },
+  {
+    id:'carbonero', nombre:'Grupo Carbonero — Optimización de procesos', codigo:'CARBONERO 2026',
+    cliente:'Grupo Carbonero', salud:'idle', kickoff:'2026-04-20', cierre:'2026-11-15',
+    sprints:[], frentes:[], riesgos:[],
+    bitacora:[{fecha:'2026-08-29', autor:'Agustín', tipo:'decision', t:'Proyecto en pausa hasta que el cliente confirme el alcance de la segunda etapa.'}],
+    proximos:[], lineamientos:[]
+  }
+  ]
+};
+
+/* ---------- helpers ---------- */
+const $ = (s,r=document)=>r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dias = (a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
+const fecha = s => new Date(s+'T12:00:00').toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+const sprintActivo = p => p.sprints.find(s=>HOY>=s.del && HOY<=s.al) || p.sprints.find(s=>HOY<s.del) || null;
+
+let vista = {tipo:'semana', id:null};
+const mailOpts = {avances:true, bloqueos:true, hitos:true, proximos:true, riesgos:false, lineamientos:true};
+const lineamientosNuevos = [];
+
+/* ---------- nav ---------- */
+function renderNav(){
+  const salud = {ok:'ok',warn:'warn',stop:'stop',idle:'idle'};
+  $('#railnav').innerHTML = `
+    <button class="navbtn" data-v="semana" ${vista.tipo==='semana'?'aria-current="true"':''}>La semana</button>
+    ${state.proyectos.map(p=>`
+      <button class="navbtn" data-v="proyecto" data-id="${p.id}" ${vista.tipo==='proyecto'&&vista.id===p.id?'aria-current="true"':''}>
+        <i class="dot ${salud[p.salud]}"></i>${esc(p.cliente)}
+      </button>`).join('')}
+    <button class="navbtn" data-v="mail" ${vista.tipo==='mail'?'aria-current="true"':''}>Correo del lunes</button>
+    <button class="navbtn" data-v="lineamientos" ${vista.tipo==='lineamientos'?'aria-current="true"':''}>Lineamientos</button>
+    <button class="navbtn" data-v="perfil" ${vista.tipo==='perfil'?'aria-current="true"':''}>Mi perfil</button>
+  `;
+  $('#railnav').querySelectorAll('.navbtn').forEach(b=>{
+    b.onclick = ()=>{ vista = {tipo:b.dataset.v, id:b.dataset.id||null}; render(); window.scrollTo(0,0); };
+  });
+}
+
+/* ---------- vista: la semana ---------- */
+function vistaSemana(){
+  const bloqueos = [];
+  const movs = [];
+  const hitos = [];
+  state.proyectos.forEach(p=>{
+    p.bitacora.filter(e=>dias(e.fecha,HOY)<=7).forEach(e=>{
+      (e.tipo==='bloqueo'?bloqueos:movs).push({...e, proyecto:p.cliente, pid:p.id});
+    });
+    p.frentes.forEach(f=>{
+      if(f.hito.estado!=='cumplido') hitos.push({...f.hito, frente:f.nombre, quien:f.responsable, proyecto:p.cliente, pid:p.id});
+    });
+  });
+
+  return `
+    <h1>La semana</h1>
+    <p class="lede">${esc(state.semana.etiqueta)}. Todo lo de acá abajo sale de los archivos del proyecto — nadie lo carga a mano.</p>
+
+    <h2>Hitos que hay que destrabar</h2>
+    <div class="stack">
+      ${hitos.length ? hitos.map(h=>`
+        <div class="blocker">
+          <h3>${esc(h.frente)} <span class="age">${h.desde>HOY?'arranca el '+fecha(h.desde):'abierto hace '+dias(h.desde,HOY)+' días'}</span></h3>
+          <div class="mono">${esc(h.proyecto)} · ${esc(h.quien)}</div>
+          <p style="margin:7px 0 0;font-size:13.5px;color:var(--ink-dim)">${esc(h.texto)}</p>
+        </div>`).join('')
+      : `<div class="empty">Ningún hito bloqueante abierto.</div>`}
+    </div>
+
+    <h2>Bloqueos</h2>
+    ${bloqueos.length ? `<ul class="feed">${bloqueos.map(e=>entradaFeed(e,true)).join('')}</ul>`
+      : `<div class="empty">Nadie registró bloqueos esta semana.</div>`}
+
+    <h2>Qué se movió</h2>
+    ${movs.length ? `<ul class="feed">${movs.map(e=>entradaFeed(e,true)).join('')}</ul>`
+      : `<div class="empty">Sin registros en los últimos siete días. Si el equipo trabajó, faltó correr el cierre de sesión.</div>`}
+  `;
+}
+
+function entradaFeed(e, conProyecto){
+  return `<li>
+    <div><time>${fecha(e.fecha)}</time><div class="who">${esc(e.autor)}${conProyecto?' · '+esc(e.proyecto):''}</div></div>
+    <div><span class="tag ${e.tipo}">${e.tipo}</span>${esc(e.t)}</div>
+  </li>`;
+}
+
+/* ---------- vista: proyecto ---------- */
+function vistaProyecto(p){
+  if(!p.sprints.length){
+    return `<h1>${esc(p.nombre)}</h1>
+      <p class="lede">Este proyecto todavía no tiene la carpeta estandarizada, así que el panel sólo muestra su bitácora.</p>
+      <h2>Bitácora</h2><ul class="feed">${p.bitacora.map(e=>entradaFeed(e,false)).join('')}</ul>`;
+  }
+  const act = sprintActivo(p);
+  return `
+    <h1>${esc(p.nombre)}</h1>
+    <p class="lede"><span class="mono">${esc(p.codigo)}</span></p>
+
+    <h2>Recorrido de sprints</h2>
+    ${regla(p, act)}
+
+    <h2>Frentes</h2>
+    <div class="grid2">${p.frentes.map(f=>tarjetaFrente(p,f,act)).join('')}</div>
+
+    <h2>Riesgos a vigilar</h2>
+    <div class="card">
+      <table>
+        <thead><tr><th style="width:70px">Nivel</th><th>Riesgo</th></tr></thead>
+        <tbody>${p.riesgos.map(r=>`<tr><td><b style="color:${r.nivel==='alto'?'var(--warn)':'var(--ink-dim)'}">${r.nivel}</b></td><td>${esc(r.t)}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+
+    <h2>Bitácora</h2>
+    <ul class="feed">${p.bitacora.map(e=>entradaFeed(e,false)).join('')}</ul>
+  `;
+}
+
+function regla(p, act){
+  const cab = p.sprints.map(s=>{
+    const cls = act && s.n===act.n ? 'now' : (HOY>s.al?'done':'');
+    return `<div class="rcell rhead ${cls}"><div class="n">Sprint ${s.n}</div><div class="d">${fecha(s.del)} – ${fecha(s.al)}</div></div>`;
+  }).join('');
+  const fila = (letra,nombre) => p.sprints.map(s=>{
+    const cls = act && s.n===act.n ? 'now' : (HOY>s.al?'done':'');
+    return `<div class="rcell ${cls}"><div class="rfocus">${esc(s[letra])}</div></div>`;
+  }).join('');
+  return `<div class="ruler"><div class="ruler-scroll"><div class="ruler-grid">
+    <div class="rcell rhead"></div>${cab}
+    <div class="rcell rlabel"><i class="dot ok"></i>Frente A</div>${fila('A')}
+    <div class="rcell rlabel"><i class="dot warn"></i>Frente B</div>${fila('B')}
+  </div></div></div>
+  <p class="note" style="margin-top:8px">El sprint marcado es el que corre hoy. Las celdas salen de la tabla de <span class="mono">00_Plan_General_Sprints.md</span>.</p>`;
+}
+
+function tarjetaFrente(p,f,act){
+  const hechos = f.dod.filter(d=>d.ok).length;
+  const pct = Math.round(hechos/f.dod.length*100);
+  const cumplido = f.hito.estado==='cumplido';
+  return `<div class="card">
+    <h3>Frente ${f.id} — ${esc(f.nombre)}</h3>
+    <div class="mono">${esc(f.responsable)} · Sprint ${act?act.n:'—'}</div>
+    <p style="font-size:13.5px;color:var(--ink-dim);margin:10px 0 14px">${esc(f.objetivo)}</p>
+
+    <div class="blocker ${cumplido?'clear':''}">
+      <h3>Hito bloqueante <span class="age">${cumplido?'cumplido':(f.hito.desde>HOY?'arranca el '+fecha(f.hito.desde):dias(f.hito.desde,HOY)+' días abierto')}</span></h3>
+      <p style="margin:6px 0 0;font-size:13.2px;color:var(--ink-dim)">${esc(f.hito.texto)}</p>
+    </div>
+
+    <div style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--ink-dim)">
+        <span>Definición de hecho</span><span class="mono">${hechos} de ${f.dod.length}</span>
+      </div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <ul class="dod">
+        ${f.dod.map((d,i)=>`<li class="${d.ok?'on':''}">
+          <input type="checkbox" ${d.ok?'checked':''} data-p="${p.id}" data-f="${f.id}" data-i="${i}">
+          <span>${esc(d.t)}</span></li>`).join('')}
+      </ul>
+      <p class="note" style="margin-top:10px">En producción esto no se toca acá: refleja los <span class="mono">- [ ]</span> del archivo de sprint. En el prototipo se puede marcar para ver cómo se mueve el avance.</p>
+    </div>
+    <p class="mono" style="margin-top:12px">${esc(f.archivo)}</p>
+  </div>`;
+}
+
+/* ---------- vista: correo ---------- */
+function vistaMail(){
+  const p = state.proyectos[0];
+  const o = mailOpts;
+  return `
+    <h1>Correo del lunes</h1>
+    <p class="lede">Elegí qué entra y el sistema lo manda antes de la reunión de planificación. El texto sale de los archivos, no se escribe a mano.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>Qué incluir</h3>
+        <div class="opts">
+          ${[['hitos','Hitos bloqueantes abiertos'],['bloqueos','Bloqueos registrados'],['avances','Avances de la semana'],['proximos','Próximos pasos por frente'],['lineamientos','Lineamientos pendientes'],['riesgos','Riesgos del proyecto']]
+            .map(([k,t])=>`<label class="opt"><input type="checkbox" data-mail="${k}" ${o[k]?'checked':''}><span>${t}</span></label>`).join('')}
+        </div>
+        <label class="fld" style="margin-top:16px"><span>Destinatarios</span>
+          <input type="text" value="agustin@inspirare.com.ar; guido@inspirare.com.ar; jmdaher@inspirare.com.ar">
+        </label>
+        <div class="row">
+          <label class="fld"><span>Cuándo</span>
+            <select><option>Lunes 8:00, antes de la reunión</option><option>Viernes 18:00, cierre de semana</option><option>Sólo cuando lo pida</option></select>
+          </label>
+          <label class="fld"><span>Proyectos</span>
+            <select><option>Todos los activos</option><option>Sólo LP SA</option></select>
+          </label>
+        </div>
+        <button class="btn" onclick="alert('En el prototipo no sale nada. En producción lo manda Graph API con tu cuenta de Outlook.')">Enviar prueba a mí</button>
+      </div>
+
+      <div>
+        <h3 style="margin-bottom:10px">Vista previa</h3>
+        <div class="preview">
+          <h4>LP SA — arranca el Sprint 1</h4>
+          <p class="sub">Semana del 14 al 20 de septiembre · generado el lunes 8:00</p>
+          ${o.hitos?`<h5>Hitos que hay que destrabar</h5>
+            <ul>${p.frentes.map(f=>`<li><b>${esc(f.nombre)}</b> (${esc(f.responsable)}): ${esc(f.hito.texto.split('.')[0])}.</li>`).join('')}</ul>`:''}
+          ${o.bloqueos?`<h5>Bloqueos</h5><div class="flag">SAUDA: los Megamente corren con MCP local y deberían correr en remoto. Abierto hace 6 días.</div>`:''}
+          ${o.avances?`<h5>Qué se movió</h5>
+            <ul>
+              <li>Alcance reducido confirmado tras la aprobación de Mauricio. Integreitor queda fuera de esta etapa.</li>
+              <li>Reparto de frentes acordado entre Fernando y JMD, con convención de carpetas.</li>
+            </ul>`:''}
+          ${o.proximos?`<h5>Próximos pasos</h5>
+            <ul>${p.proximos.map(x=>`<li>${esc(x.t)} — ${esc(x.quien)}</li>`).join('')}</ul>`:''}
+          ${o.lineamientos?`<h5>Lineamientos pendientes</h5><ul><li>Ninguno abierto.</li></ul>`:''}
+          ${o.riesgos?`<h5>Riesgos</h5><ul>${p.riesgos.map(r=>`<li>${esc(r.t)}</li>`).join('')}</ul>`:''}
+          <p style="margin-top:18px;font-size:12.5px;color:#5A6B82">Ver el detalle en el panel.</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------- vista: lineamientos ---------- */
+function vistaLineamientos(){
+  const todos = state.proyectos.flatMap(p=>p.lineamientos.map(l=>({...l,proyecto:p.cliente})))
+    .concat(lineamientosNuevos);
+  return `
+    <h1>Lineamientos</h1>
+    <p class="lede">Para bajar una indicación al equipo sin abrir la computadora. Queda escrita en el archivo del proyecto y entra en el correo del lunes.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>Nuevo lineamiento</h3>
+        <div class="row">
+          <label class="fld"><span>Proyecto</span>
+            <select id="l-proy">${state.proyectos.map(p=>`<option value="${p.id}">${esc(p.cliente)}</option>`).join('')}</select>
+          </label>
+          <label class="fld"><span>Para</span>
+            <select id="l-para"><option>Fernando</option><option>Juan Manuel</option><option>Guido</option><option>Los dos frentes</option></select>
+          </label>
+        </div>
+        <label class="fld"><span>Qué hay que hacer</span>
+          <textarea id="l-texto" placeholder="Ej.: antes del cierre del sprint quiero el documento de reglas revisado por Lucas, no sólo escrito por nosotros."></textarea>
+        </label>
+        <button class="btn" id="l-add">Guardar lineamiento</button>
+        <p class="note" style="margin-top:12px">En producción esto escribe un bloque en <span class="mono">Seguimiento/Lineamientos.md</span> vía Graph API, y aparece en la carpeta de todos al sincronizar OneDrive.</p>
+      </div>
+
+      <div class="card">
+        <h3>Así queda en el archivo</h3>
+        <pre class="md" id="l-md">${esc(previewMd())}</pre>
+      </div>
+    </div>
+
+    <h2>Abiertos y cumplidos</h2>
+    <div class="card">
+      <table>
+        <thead><tr><th style="width:80px">Fecha</th><th style="width:110px">Proyecto</th><th>Lineamiento</th><th style="width:90px">Estado</th></tr></thead>
+        <tbody>${todos.map(l=>`<tr>
+          <td class="mono">${fecha(l.fecha)}</td><td>${esc(l.proyecto)}</td>
+          <td><b>${esc(l.para)}</b> — ${esc(l.t)}</td>
+          <td style="color:${l.estado==='cumplido'?'var(--ok)':'var(--warn)'}">${esc(l.estado)}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+/* ---------- vista: mi perfil ---------- */
+function vistaPerfil(){
+  const mias = [];
+  state.proyectos.forEach(p=>{
+    p.bitacora.filter(e=>e.autor===sesion.nombre).forEach(e=>mias.push({...e, proyecto:p.cliente}));
+  });
+  mias.sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  return `
+    <h1>Mi perfil</h1>
+    <p class="lede">${esc(sesion.nombre)} · ${mias.length} registro${mias.length===1?'':'s'} de bitácora a tu nombre, en todos los proyectos.</p>
+    ${mias.length ? `<ul class="feed">${mias.map(e=>entradaFeed(e,true)).join('')}</ul>`
+      : `<div class="empty">Todavía no hay bitácora registrada a tu nombre. Si trabajaste, faltó correr el cierre de sesión — o tu nombre en la bitácora no coincide con el de tu usuario.</div>`}
+  `;
+}
+
+function previewMd(){
+  const l = lineamientosNuevos[lineamientosNuevos.length-1];
+  if(!l) return `## 2026-09-09 — Agustín\n\n**Para**: Fernando y JMD\n**Estado**: cumplido\n\nAntes del kick off quiero los dos Sprint 1 escritos con hito\nbloqueante y definición de hecho, para presentarlos al cliente\nel lunes.`;
+  return `## ${l.fecha} — Agustín\n\n**Para**: ${l.para}\n**Estado**: abierto\n\n${l.t}`;
+}
+
+/* ---------- render ---------- */
+function render(){
+  renderNav();
+  const m = $('#main');
+  if(vista.tipo==='semana') m.innerHTML = vistaSemana();
+  else if(vista.tipo==='proyecto') m.innerHTML = vistaProyecto(state.proyectos.find(p=>p.id===vista.id));
+  else if(vista.tipo==='mail') m.innerHTML = vistaMail();
+  else if(vista.tipo==='perfil') m.innerHTML = vistaPerfil();
+  else m.innerHTML = vistaLineamientos();
+
+  m.querySelectorAll('[data-mail]').forEach(c=>{
+    c.onchange = ()=>{ mailOpts[c.dataset.mail]=c.checked; render(); };
+  });
+  m.querySelectorAll('.dod input').forEach(c=>{
+    c.onchange = ()=>{
+      const p = state.proyectos.find(x=>x.id===c.dataset.p);
+      p.frentes.find(f=>f.id===c.dataset.f).dod[+c.dataset.i].ok = c.checked;
+      render();
+    };
+  });
+  const add = $('#l-add');
+  if(add) add.onclick = ()=>{
+    const t = $('#l-texto').value.trim();
+    if(!t){ $('#l-texto').focus(); return; }
+    const pid = $('#l-proy').value;
+    lineamientosNuevos.push({
+      fecha:HOY, de:'Agustín', para:$('#l-para').value, t,
+      estado:'abierto', proyecto:state.proyectos.find(p=>p.id===pid).cliente
+    });
+    render();
+  };
+}
+
+/* =========================================================================
+   autenticación — login sencillo, contraseñas hasheadas (SHA-256) en
+   sitio/usuarios.json. Ese archivo lo genera el workflow de publicación a
+   partir de un secret de GitHub (ver .github/workflows/deploy.yml y
+   scripts/build_usuarios.py); nunca contiene contraseñas en texto plano.
+   No es una autenticación fuerte: cualquiera con el link directo al sitio
+   estático puede pedir usuarios.json o state.json sin loguearse. Alcanza
+   para identificar a alguien del equipo y armarle un perfil, no para
+   restringir acceso de verdad (ver docs/decisiones/002-login-y-control-de-acceso.md).
+   ========================================================================= */
+let usuarios = [];
+let sesion = null;
+
+async function sha256Hex(texto){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function cargarUsuarios(){
+  try{
+    const r = await fetch('usuarios.json', {cache:'no-store'});
+    if(!r.ok) throw new Error(r.status);
+    usuarios = await r.json();
+  }catch(err){
+    usuarios = null;
+  }
+}
+
+function sesionGuardada(){
+  try{ return JSON.parse(sessionStorage.getItem('panel_sesion')); }
+  catch{ return null; }
+}
+
+function mostrarError(msg){
+  const error = $('#loginError');
+  error.textContent = msg;
+  error.classList.remove('hidden');
+}
+
+async function manejarLogin(ev){
+  ev.preventDefault();
+  $('#loginError').classList.add('hidden');
+
+  if(usuarios === null){
+    mostrarError('No se encontró sitio/usuarios.json. En local: copiá usuarios.example.json y renombralo a usuarios.json (ver README). En producción lo genera el workflow de publicación.');
+    return;
+  }
+  const usuario = $('#loginUsuario').value.trim().toLowerCase();
+  const hash = await sha256Hex($('#loginPassword').value);
+  const match = usuarios.find(u=>u.usuario===usuario && u.hash===hash);
+  if(!match){
+    mostrarError('Usuario o contraseña incorrectos.');
+    return;
+  }
+  sesion = {usuario:match.usuario, nombre:match.nombre};
+  sessionStorage.setItem('panel_sesion', JSON.stringify(sesion));
+  mostrarApp();
+}
+
+function cerrarSesion(){
+  sessionStorage.removeItem('panel_sesion');
+  sesion = null;
+  vista = {tipo:'semana', id:null};
+  $('#shell').classList.add('hidden');
+  $('#loginWrap').classList.remove('hidden');
+  $('#loginForm').reset();
+}
+
+function mostrarApp(){
+  $('#loginWrap').classList.add('hidden');
+  $('#shell').classList.remove('hidden');
+  $('#quienSoy').textContent = 'Conectado como ' + sesion.nombre;
+  render();
+}
+
+async function init(){
+  await cargarUsuarios();
+  sesion = sesionGuardada();
+  $('#loginForm').addEventListener('submit', manejarLogin);
+  $('#logoutBtn').addEventListener('click', cerrarSesion);
+  if(sesion) mostrarApp();
+}
+init();
+</script>
+</body>
+</html>

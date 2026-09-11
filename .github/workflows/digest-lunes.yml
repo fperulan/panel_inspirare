@@ -1,0 +1,14 @@
+name: Correo del lunes (pendiente — Etapa 3)
+
+# Envía el correo semanal por Microsoft Graph API a partir de sitio/state.json.
+# Deshabilitado hasta que exista mail/digest.py y state.json real.
+# Ver docs/00_Panel_Seguimiento.md, Etapa 3.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Pendiente — Etapa 3 del roadmap (docs/00_Panel_Seguimiento.md)"

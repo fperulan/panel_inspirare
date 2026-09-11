@@ -1,0 +1,14 @@
+# Datos reales de cliente — fixture de referencia local para probar el
+# parser, no debe entrar al historial de git (ver docs/00_Panel_Seguimiento.md).
+Modelo de proyecto real/
+
+# Generado por scripts/build_usuarios.py a partir del secret PANEL_USERS —
+# nunca se commitea, solo lo ve el runner del workflow de publicación.
+sitio/usuarios.json
+
+# Credenciales locales (Etapa 2: Graph API / Azure app registration).
+.env
+*.env
+
+__pycache__/
+*.pyc

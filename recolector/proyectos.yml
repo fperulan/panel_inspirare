@@ -1,0 +1,20 @@
+# Manifiesto de clientes/proyectos que el recolector debe leer.
+# Agregar un cliente nuevo es agregar una entrada acá, no tocar código.
+# Pendiente — Etapa 2 (ver docs/00_Panel_Seguimiento.md y
+# docs/estructura-organizacional.md). Rutas de ejemplo, sin confirmar todavía
+# contra los IDs reales de Microsoft Graph.
+
+- id: krikos
+  cliente: LoPresti Posca
+  ruta_onedrive: "LoPresti Posca - Documents/PO_LP_26_Krikos-Compras-FillRate"
+  activo: true
+
+- id: sauda
+  cliente: SAUDA SRL
+  ruta_onedrive: "SAUDA SRL - Documents"
+  activo: true
+
+- id: carbonero
+  cliente: Grupo Carbonero
+  ruta_onedrive: "Grupo CARBONERO - Documents"
+  activo: false

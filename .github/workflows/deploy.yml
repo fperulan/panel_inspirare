@@ -1,0 +1,50 @@
+name: Publicar sitio
+
+# Genera sitio/usuarios.json a partir del secret PANEL_USERS (ver
+# scripts/build_usuarios.py) y publica sitio/ en GitHub Pages.
+# Requiere: Settings → Pages → Build and deployment → Source: GitHub Actions,
+# y el secret PANEL_USERS en Settings → Secrets and variables → Actions.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'sitio/**'
+      - 'scripts/build_usuarios.py'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generar usuarios.json con contraseñas hasheadas
+        env:
+          PANEL_USERS: ${{ secrets.PANEL_USERS }}
+        run: python scripts/build_usuarios.py
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: sitio
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

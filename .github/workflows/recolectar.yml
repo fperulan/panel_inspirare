@@ -1,0 +1,14 @@
+name: Recolectar (pendiente — Etapa 2)
+
+# Genera sitio/state.json leyendo OneDrive vía Microsoft Graph API.
+# Deshabilitado hasta que exista recolector/build_state.py y los secrets de
+# la app registration en Azure. Ver docs/00_Panel_Seguimiento.md, Etapa 2.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Pendiente — Etapa 2 del roadmap (docs/00_Panel_Seguimiento.md)"
