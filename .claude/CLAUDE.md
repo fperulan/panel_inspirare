@@ -2,8 +2,11 @@
 
 Contexto completo en [`docs/00_Panel_Seguimiento.md`](../docs/00_Panel_Seguimiento.md).
 Antes de proponer cambios de arquitectura, leerlo entero — ya resuelve varias
-preguntas obvias (por qué no Planner/Loop, por qué OneDrive y no git, por qué
-Azure Static Web Apps y no GitHub Pages).
+preguntas obvias (por qué no Planner/Loop, por qué OneDrive y no git). Para
+el hosting específicamente, la decisión vigente y su historial (se probó
+Azure Static Web Apps y se volvió a GitHub Pages el mismo día) están en
+`docs/decisiones/001-hosting-y-fuente-de-verdad.md` — no asumir cuál está
+vigente sin leerla, porque ya cambió dos veces en un día.
 
 ## Reglas del proyecto
 

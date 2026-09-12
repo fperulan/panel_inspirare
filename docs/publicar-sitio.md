@@ -5,73 +5,64 @@ estado: vigente
 fecha: 2026-09-11
 ---
 
-# Cómo publicar el sitio (Azure Static Web Apps)
+# Cómo publicar el sitio (GitHub Pages)
 
-El código ya está en GitHub (`fperulan/panel_inspirare`, repo privado) y el
-workflow que hace la publicación ([.github/workflows/deploy.yml](../.github/workflows/deploy.yml))
-ya está commiteado. Se cambió de GitHub Pages a **Azure Static Web Apps**
-porque Pages no funciona con repo privado en el plan gratis de GitHub (ver
-[`decisiones/001-hosting-y-fuente-de-verdad.md`](decisiones/001-hosting-y-fuente-de-verdad.md)).
-Faltan tres configuraciones que sólo se hacen **una vez**.
+El código ya está en GitHub (`fperulan/panel_inspirare`) y el workflow que
+hace la publicación ([.github/workflows/deploy.yml](../.github/workflows/deploy.yml))
+ya está commiteado. Faltan dos configuraciones que sólo se hacen **una vez**.
 
-## 1. Crear el recurso en Azure
+> **Nota**: el mismo día se probó Azure Static Web Apps y se volvió atrás
+> porque pedía cargar una tarjeta para cualquier suscripción de Azure, incluso
+> para el plan gratis. Se decidió, por ahora, pasar el repo a **público** para
+> poder usar GitHub Pages sin esa fricción y validar rápido. Historial
+> completo, con los trade-offs de cada camino, en
+> [`decisiones/001-hosting-y-fuente-de-verdad.md`](decisiones/001-hosting-y-fuente-de-verdad.md).
 
-1. Entrar a [portal.azure.com](https://portal.azure.com) → buscar **Static
-   Web Apps** → **Create**.
-2. **Resource group**: crear uno nuevo (ej. `panel-inspirare-rg`).
-3. **Name**: `panel-inspirare` (o el que prefieras).
-4. **Plan type**: **Free**.
-5. **Región**: cualquiera cercana disponible para Static Web Apps (ej. East
-   US 2, West Europe).
-6. **Deployment details → Source**: elegir **Other** (no "GitHub") — así
-   Azure no pide conectarse directo al repo, sólo crea el recurso y un token
-   que se carga a mano en el paso 3. Es más simple que autorizar la app de
-   GitHub de Azure.
-7. **Review + create** → **Create**. Tarda menos de un minuto.
+## 0. Repo público
 
-## 2. Copiar el token de deploy
+GitHub Pages no funciona con repo privado en el plan gratis de GitHub.
+Settings → General → Danger Zone → **Change visibility** → **Make public**.
 
-1. Ir al recurso recién creado → **Overview**.
-2. Botón **Manage deployment token** → copiar el valor.
+## 1. Cargar el secret con las credenciales de login
 
-## 3. Cargar los secrets en GitHub
+El sitio pide usuario y contraseña (ver
+[`decisiones/002-login-y-control-de-acceso.md`](decisiones/002-login-y-control-de-acceso.md)).
 
-En `https://github.com/fperulan/panel_inspirare/settings/secrets/actions`
-(o: repo → **Settings** → **Secrets and variables** → **Actions**), crear
-**dos** repository secrets:
+1. Entrar a `https://github.com/fperulan/panel_inspirare/settings/secrets/actions`.
+2. **New repository secret** → **Name**: `PANEL_USERS` → **Secret**:
+   ```json
+   [{"usuario": "admin", "nombre": "Admin", "password": "12345"}]
+   ```
+3. **Add secret**.
 
-- **`AZURE_STATIC_WEB_APPS_API_TOKEN`**: el token copiado en el paso 2.
-- **`PANEL_USERS`**: las credenciales de login (ver
-  [`decisiones/002-login-y-control-de-acceso.md`](decisiones/002-login-y-control-de-acceso.md)),
-  por ejemplo:
-  ```json
-  [{"usuario": "admin", "nombre": "Admin", "password": "12345"}]
-  ```
+## 2. Habilitar Pages con GitHub Actions como origen
 
-## 4. Disparar la publicación
+1. Repo → **Settings** → **Pages**.
+2. **Build and deployment → Source**: elegir **GitHub Actions**.
+
+## 3. Disparar la primera publicación
 
 1. Repo → pestaña **Actions** → workflow **Publicar sitio**.
 2. **Run workflow** → **Run workflow** para confirmar.
-3. Esperar el ✓ verde (menos de un minuto).
+3. Esperar el ✓ verde.
 
-## 5. Ver el sitio publicado
+## 4. Ver el sitio publicado
 
-La URL pública aparece en el recurso de Azure → **Overview** (algo como
-`https://<nombre-random>.azurestaticapps.net`). Entrar con el usuario y
-contraseña que hayas puesto en `PANEL_USERS`.
+Settings → Pages muestra la URL (algo como
+`https://fperulan.github.io/panel_inspirare/`). Entrar con `admin` / la
+contraseña del secret.
 
 ## Nota sobre privacidad
 
-El repo es privado, pero **la URL del sitio publicado es pública** —
-cualquiera que la tenga puede abrirla (el login sólo identifica, no bloquea
-el acceso a los archivos; ver la ADR 002). No compartir el link fuera del
-equipo. Azure Static Web Apps sí permite, más adelante, exigir login real
-por ruta (`staticwebapp.config.json` + un proveedor de identidad como Entra
-ID) si en algún momento hace falta bloquear el acceso de verdad — no está
-configurado todavía, a propósito.
+El repo ahora es público — cualquiera puede ver el código y la
+documentación, incluidos nombres reales y contexto comercial de LP SA en
+`sitio/index.html` y en `docs/*.md`. `Modelo de proyecto real/` sigue
+excluido por `.gitignore` y no se sube. Esta es una decisión consciente para
+validar rápido (2026-09-11) — si más adelante hace falta volver a privado,
+el camino ya explorado es Azure Static Web Apps (ver ADR 001), resolviendo
+antes el tema de la tarjeta.
 
 ## Actualizar credenciales más adelante
 
-Editar el secret `PANEL_USERS` (mismo lugar del paso 3) con la lista
-completa de personas, y volver a correr el workflow (paso 4) para que tome
-el cambio — un push normal a `sitio/` también lo dispara solo.
+Editar el secret `PANEL_USERS` (paso 1) y volver a correr el workflow (paso
+3) — un push normal a `sitio/` también lo dispara solo.

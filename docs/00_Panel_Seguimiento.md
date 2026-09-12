@@ -94,14 +94,12 @@ OneDrive (fuente de verdad)
          ┌──────────┴──────────┐
          ▼                     ▼
    Sitio estático        Correo semanal
-   (Azure Static             (Graph API → Outlook)
-    Web Apps)
+   (GitHub Pages)        (Graph API → Outlook)
 ```
 
-**Decisión de hosting**: Azure Static Web Apps, publicado por una GitHub
-Action. Originalmente se había elegido GitHub Pages; se cambió el mismo día
-por una limitación de plan (Pages no funciona con repo privado en GitHub
-Free) — historial completo en
+**Decisión de hosting**: GitHub Pages, con el repo público. Se probó Azure
+Static Web Apps el mismo día para mantener el repo privado, pero Azure exige
+tarjeta hasta para el plan gratis — historial completo en
 [`decisiones/001-hosting-y-fuente-de-verdad.md`](decisiones/001-hosting-y-fuente-de-verdad.md).
 
 **Alternativas evaluadas y descartadas para la v1**:
@@ -203,7 +201,7 @@ guardar. Dos segundos de fricción que evitan una bitácora con datos inventados
 - GitHub Action programada.
 
 **Etapa 3 — Publicación**
-- Sitio en Azure Static Web Apps alimentado por `state.json`.
+- Sitio en GitHub Pages alimentado por `state.json`.
 - Correo semanal por Graph API, lunes a la mañana antes de la reunión.
 
 **Etapa 4 — Entrada de lineamientos**
@@ -260,8 +258,8 @@ panel-inspirare/
   (usuario/contraseña, sin Entra ID) con la vista "Mi perfil". Detalle en
   [`docs/decisiones/002-login-y-control-de-acceso.md`](decisiones/002-login-y-control-de-acceso.md).
   Queda pendiente si en algún momento hace falta restringir acceso de verdad
-  (Entra ID + `staticwebapp.config.json`, ya que se está en Azure Static Web
-  Apps) en vez de sólo identificar.
+  en vez de sólo identificar — el camino evaluado es Azure Static Web Apps +
+  Entra ID, ver ADR 001 y ADR 002.
 - **Carpeta de Inspirare Consulting (no por cliente)**: propuesta completa en
   [`docs/estructura-organizacional.md`](estructura-organizacional.md).
   Pendiente de confirmar con el equipo si `Inspirare Ops` (Teams) es la

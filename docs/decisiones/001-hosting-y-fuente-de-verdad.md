@@ -1,48 +1,61 @@
 # 001 — Hosting y fuente de verdad
 
-**Estado**: aceptada, hosting revisado — 2026-09-11 (actualizada 2026-09-11)
+**Estado**: aceptada, hosting revisado dos veces en el mismo día — 2026-09-11
 
 ## Contexto
 
 Hay que elegir dónde vive el sitio y dónde vive la fuente de verdad de los
 datos que muestra.
 
-## Decisión
+## Decisión (vigente)
 
-- **Hosting**: **Azure Static Web Apps** (capa gratuita). Revisado el mismo
-  día en que se aceptó — ver "Revisión" más abajo.
+- **Hosting**: **GitHub Pages**, con el **repo público**. Ver "Revisión 2"
+  más abajo para el porqué de volver acá después de probar Azure.
 - **Fuente de verdad**: los archivos Markdown en OneDrive, tal como el equipo
   ya los genera trabajando con Claude. El sitio lee; no edita (con la
   excepción controlada de los lineamientos, ver sección 7 de
   `00_Panel_Seguimiento.md`).
 
-## Revisión 2026-09-11 — de GitHub Pages a Azure Static Web Apps
+## Revisión 1 (2026-09-11) — de GitHub Pages a Azure Static Web Apps
 
-La decisión original era GitHub Actions + GitHub Pages. Se cayó en cuanto se
-intentó usar: **GitHub Pages no está disponible con repositorio privado en el
-plan gratis de GitHub** (pide pasar el repo a público o pagar GitHub Pro). El
-repo se había puesto en privado ese mismo día por los datos reales de cliente
-que contiene el propio sitio y la documentación — volver a público no era
-aceptable.
+La decisión original era GitHub Actions + GitHub Pages con **repo privado**.
+Se cayó en cuanto se intentó usar: **GitHub Pages no está disponible con
+repositorio privado en el plan gratis de GitHub** (pide pasar el repo a
+público o pagar GitHub Pro). El repo se había puesto en privado ese mismo día
+por los datos reales de cliente que contiene el propio sitio y la
+documentación — volver a público no parecía aceptable en ese momento.
 
-Se evaluaron tres salidas: volver el repo a público, pagar GitHub Pro, o
-migrar de hosting. Se eligió migrar a **Azure Static Web Apps**: capa
-gratuita, se despliega desde el repo privado sin exponerlo (usa un token de
-deploy, no requiere que el repo sea público), y además deja preparado el
-camino para el control de acceso real con Entra ID que quedó pendiente en la
-ADR 002 — sin implementarlo todavía, sólo sin tener que migrar de nuevo el
-día que haga falta.
+Se migró a **Azure Static Web Apps**: capa gratuita, se despliega desde el
+repo privado sin exponerlo, y de paso deja preparado el camino para el
+control de acceso real con Entra ID (ADR 002).
+
+## Revisión 2 (2026-09-11, mismo día) — vuelta a GitHub Pages, repo público
+
+Al crear el recurso en Azure apareció otra fricción: **Azure exige una
+suscripción con tarjeta cargada para cualquier recurso, incluso el plan
+gratis** (a diferencia de GitHub Pages, Cloudflare Pages o Netlify, que no
+piden tarjeta). El tenant de Inspirare en Azure no tenía ninguna suscripción
+activa, y activar una implicaba resolver primero de quién es la tarjeta —
+algo que no se quería frenar a esperar.
+
+**Decisión**: pasar el repo a **público** y volver a **GitHub Pages** para
+validar rápido, aceptando conscientemente que el código y la documentación
+quedan visibles (`Modelo de proyecto real/` sigue afuera por `.gitignore`,
+pero `sitio/index.html` y los `docs/*.md` sí tienen nombres reales y contexto
+comercial de LP SA). Si más adelante se resuelve el tema de la tarjeta,
+volver a Azure Static Web Apps con repo privado sigue siendo el camino ya
+explorado — el workflow y la documentación de esa opción quedaron descritos
+acá arriba, por si hace falta retomarlos.
 
 ## Alternativas descartadas
 
-- **GitHub Pages**: descartada por la limitación de plan gratis + repo
-  privado explicada arriba.
-- **Pagar GitHub Pro**: mantenía todo igual, pero suma un costo recurrente
-  sólo para esto.
-- **Cloudflare Pages / Netlify**: también gratis y compatibles con repos
-  privados, pero alejan la infraestructura del ecosistema Microsoft que ya
-  se usa para todo lo demás (OneDrive, Teams, Power BI, y Azure para el
-  recolector de la Etapa 2).
+- **Pagar GitHub Pro**: mantenía el repo privado, pero suma un costo
+  recurrente sólo para esto.
+- **Cloudflare Pages / Netlify**: gratis de verdad, sin pedir tarjeta, y
+  compatibles con repos privados — hubieran evitado las dos fricciones
+  anteriores. Se descartaron por alejarse del ecosistema Microsoft que ya se
+  usa para todo lo demás, pero quedan como opción de respaldo si GitHub
+  Pages da algún problema.
 - **Repo git como fuente de verdad, en lugar de OneDrive**: es lo más robusto
   y da historial real, pero obliga a Guido y Agustín a convivir con git.
   Queda como destino natural si el equipo se adapta más adelante — no se
