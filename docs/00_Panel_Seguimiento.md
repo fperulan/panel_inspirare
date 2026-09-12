@@ -94,12 +94,15 @@ OneDrive (fuente de verdad)
          ┌──────────┴──────────┐
          ▼                     ▼
    Sitio estático        Correo semanal
-   (GitHub Pages)        (Graph API → Outlook)
+   (Azure Static             (Graph API → Outlook)
+    Web Apps)
 ```
 
-**Decisión de hosting**: GitHub Actions + GitHub Pages. No hace falta Vercel ni
-ninguna plataforma adicional — el repo ya da build, hosting, historial y
-permisos.
+**Decisión de hosting**: Azure Static Web Apps, publicado por una GitHub
+Action. Originalmente se había elegido GitHub Pages; se cambió el mismo día
+por una limitación de plan (Pages no funciona con repo privado en GitHub
+Free) — historial completo en
+[`decisiones/001-hosting-y-fuente-de-verdad.md`](decisiones/001-hosting-y-fuente-de-verdad.md).
 
 **Alternativas evaluadas y descartadas para la v1**:
 
@@ -200,7 +203,7 @@ guardar. Dos segundos de fricción que evitan una bitácora con datos inventados
 - GitHub Action programada.
 
 **Etapa 3 — Publicación**
-- Sitio en GitHub Pages alimentado por `state.json`.
+- Sitio en Azure Static Web Apps alimentado por `state.json`.
 - Correo semanal por Graph API, lunes a la mañana antes de la reunión.
 
 **Etapa 4 — Entrada de lineamientos**
@@ -253,12 +256,12 @@ panel-inspirare/
   (Carbonero está en pausa; SAUDA tiene estructura propia).
 - Si Guido y Agustín corren el comando de cierre en sus propias sesiones o si su
   registro se deriva de otra forma.
-- **Identidad y perfil de usuario** (planteado 2026-09-11): el sitio debería
-  identificar quién lo está mirando y mostrarle en un perfil sus propios
-  movimientos recientes. Análisis completo en
-  [`docs/decisiones/002-login-y-control-de-acceso.md`](decisiones/002-login-y-control-de-acceso.md)
-  — falta decidir si alcanza con identificar (GitHub Pages + MSAL.js) o hace
-  falta restringir acceso de verdad (migrar a Azure Static Web Apps).
+- **Identidad y perfil de usuario** — resuelto para esta etapa: login simple
+  (usuario/contraseña, sin Entra ID) con la vista "Mi perfil". Detalle en
+  [`docs/decisiones/002-login-y-control-de-acceso.md`](decisiones/002-login-y-control-de-acceso.md).
+  Queda pendiente si en algún momento hace falta restringir acceso de verdad
+  (Entra ID + `staticwebapp.config.json`, ya que se está en Azure Static Web
+  Apps) en vez de sólo identificar.
 - **Carpeta de Inspirare Consulting (no por cliente)**: propuesta completa en
   [`docs/estructura-organizacional.md`](estructura-organizacional.md).
   Pendiente de confirmar con el equipo si `Inspirare Ops` (Teams) es la

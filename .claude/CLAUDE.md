@@ -3,7 +3,7 @@
 Contexto completo en [`docs/00_Panel_Seguimiento.md`](../docs/00_Panel_Seguimiento.md).
 Antes de proponer cambios de arquitectura, leerlo entero — ya resuelve varias
 preguntas obvias (por qué no Planner/Loop, por qué OneDrive y no git, por qué
-GitHub Pages).
+Azure Static Web Apps y no GitHub Pages).
 
 ## Reglas del proyecto
 

@@ -41,7 +41,7 @@ mail/                    [pendiente, Etapa 3] correo semanal por Graph API
   CLAUDE.md               instrucciones de este repo para trabajar con Claude Code
   commands/cierre.md      [pendiente, Etapa 1] comando de cierre de sesión
 .github/workflows/
-  deploy.yml              publica sitio/ en GitHub Pages (genera usuarios.json)
+  deploy.yml              publica sitio/ en Azure Static Web Apps (genera usuarios.json)
   recolectar.yml          [pendiente, Etapa 2]
   digest-lunes.yml        [pendiente, Etapa 3]
 Modelo de proyecto real/ copia de referencia del proyecto Krikos (LP SA) — no se
@@ -51,11 +51,10 @@ Modelo de proyecto real/ copia de referencia del proyecto Krikos (LP SA) — no 
 
 ## Ver el prototipo
 
-**En producción**: GitHub Pages, publicado por `.github/workflows/deploy.yml`
-en cada push a `main` que toque `sitio/`. Requiere el secret `PANEL_USERS`
-cargado en Settings → Secrets and variables → Actions (ver
-[`docs/decisiones/002-login-y-control-de-acceso.md`](docs/decisiones/002-login-y-control-de-acceso.md))
-y Pages habilitado con source "GitHub Actions".
+**En producción**: Azure Static Web Apps, publicado por
+`.github/workflows/deploy.yml` en cada push a `main` que toque `sitio/`.
+Instructivo completo (crear el recurso en Azure, cargar los secrets) en
+[`docs/publicar-sitio.md`](docs/publicar-sitio.md).
 
 **En local**: el sitio pide login, así que hace falta un `usuarios.json`.
 Nunca commitear contraseñas reales acá — para probar:

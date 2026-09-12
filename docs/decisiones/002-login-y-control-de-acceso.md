@@ -40,20 +40,22 @@ hace falta algo más robusto.
 
 ## Limitación conocida — aceptada a propósito
 
-Esto es identificación, **no es control de acceso real**. GitHub Pages sirve
-los archivos estáticos (incluido `usuarios.json` y `state.json`) a cualquiera
-que tenga el link directo, esté logueado o no — el login sólo decide qué
-*muestra la pantalla*. Es suficiente para saber quién es cada persona del
-equipo y armarle un perfil; no alcanza si en algún momento hace falta que
-alguien sin cuenta no pueda ver los datos en absoluto. Si eso pasa a
-importar, la alternativa sigue siendo migrar a Azure Static Web Apps (o
-volver a evaluar Entra ID) — no se descarta, sólo se pospone.
+Esto es identificación, **no es control de acceso real**. Azure Static Web
+Apps, en su configuración por defecto (la que se usa hoy), sirve los archivos
+estáticos (incluido `usuarios.json` y `state.json`) a cualquiera que tenga el
+link directo, esté logueado o no — el login sólo decide qué *muestra la
+pantalla*. Es suficiente para saber quién es cada persona del equipo y
+armarle un perfil; no alcanza si en algún momento hace falta que alguien sin
+cuenta no pueda ver los datos en absoluto. Si eso pasa a importar, la
+alternativa es agregar `staticwebapp.config.json` con un proveedor de
+identidad (Entra ID) para exigir login real por ruta — Azure Static Web Apps
+ya lo soporta nativamente, sólo falta configurarlo — no se descarta, sólo se
+pospone.
 
 ## Pendiente
 
 - Cargar el secret `PANEL_USERS` en GitHub con las personas reales del
   equipo (Fernando, Agustín, Guido, JMD).
-- Habilitar Pages con source "GitHub Actions" en la configuración del repo.
 - El campo `nombre` de cada usuario debe coincidir exactamente con el
   `autor` usado en las bitácoras para que "Mi perfil" encuentre sus
   registros — hoy es texto libre (ej. "JMD" vs "Juan Manuel Daher"), así que
